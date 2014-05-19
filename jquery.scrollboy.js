@@ -106,20 +106,6 @@
        		$($data.content).appendTo($("#"+$data_container));						
 										
 			
-			
-			/*search_pane.jScrollPane(
-			{
-				showArrows: true,
-				animateScroll: true,
-				autoReinitialise: true,
-				//autoReinitialise: false,
-				
-			});
-			api = search_pane.data('jsp');
-			height = api.getContentHeight();
-			maxheight = height*(.95);
-			width = api.getContentWidth();*/
-			
 				
 			
 		});
