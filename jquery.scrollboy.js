@@ -34,54 +34,58 @@
 		****************************************/
 		
 		var settings =$.extend({
-			//records		   : '10',
-			increment  	       : '10',
-			width		       : '100%',
-			height		       : '635px',
-			scrollable	       : true,
-			kill_session       : null,
-			increment		   : 10,
-			load_page	       : null,
-			load_button        : true,
-			search_button      : null,
-			load_button_text   : "load more",
-			search_button_text : null,
-			search_button_id   : "search_button",
-			data_container     : null,
-			search_container   : null,
-			border_width	   : null,
-			border_style	   : null,
-			border_color	   : null,
-			content_margin     : null,
-			add_search 		   : false,
-			fields			   : null
+		    add_search 		      : false,
+			auto_load		      : false,
+			border_width	      : null,
+			border_style	      : null,
+			border_color	      : null,
+			content_margin        : null,
+			data_container        : null,
+			fields			      : null,
+			height		          : '635px',
+			kill_session          : null,
+			increment		      : 10,
+			load_button           : true,
+			load_button_text      : "load more",
+			load_page	          : null,
+			scrollable	          : null,
+			search_button         : null,
+			search_button_text    : null,
+			search_button_id      : "search_button",
+			search_container_id   : null,
+			width		          : '100%'
+			
+			
+			
 		}, options);
 		
 		/*************************************************************************
 		* Setups all variables
 		*
 		**************************************************************************/
-			$kill_session=settings.kill_session;
-			$load_page=settings.load_page;
-			var height=0;
-			var maxheight=0;
-			$height = settings.height;
-			$scrollable = settings.scrollable;
-			$load_button = settings.load_button;
-			$load_button_text = settings.load_button_text;
-			$data_container = settings.data_container;
-			$search_container = settings.search_container;
-			$increment = (settings.increment*1);
-			$increment2 = $increment *1;
-			$border_width = settings.border_width;
+			
+			$auto_load = settings.auto_load;
+			
 			$border_color = settings.border_color;
 			$border_style = settings.border_style;
+			$border_width = settings.border_width;
 			$content_margin = settings.content_margin;
+			$data_container = settings.data_container;
+			var $fields = new Array();
+			$fields =validate_fields(settings.fields);
+			$height = settings.height;
+			$increment = (settings.increment*1);
+			$increment2 = $increment *1;
+			$kill_session=settings.kill_session;
+			$load_button = settings.load_button;
+			$load_button_text = settings.load_button_text;
+			$load_page=settings.load_page;
+			$scrollable = settings.scrollable;
+			$search_container = settings.search_container_id;
 			$search_button = settings.search_button;
 			$search_button_text = settings.search_button_text;
 			$search_button_id = settings.search_button_id;
-			var $fields = new Array();
-			$fields =validate_fields(settings.fields);
+			
 			
 			
 			addFields($fields);
@@ -99,16 +103,37 @@
 			
 		});
 		
+		
+		
+		$("#"+$data_container).scroll(function(){
+    	
+    		if($auto_load){
+    			if($(this)[0].scrollHeight - $(this).scrollTop() <= $(this).outerHeight())
+    			{
+        			load_data();
+   			 	}
+   			 }
+		});
+		
+		
 		function initialize(data){
 			
 			$("div#"+$data_container).css('max-width',settings.width);
-			$("div#"+$data_container).css('max-height',settings.height);
-			$("div#"+$data_container).css('border-width',settings.border_width);
-			$("div#"+$data_container).css('border-color',settings.border_color);
-			$("div#"+$data_container).css('border-style',settings.border_style);
+			if($scrollable){
+				$("div#"+$data_container).css('max-height',$height);
+			}else{
+				$("div#"+$data_container).css('max-height','100%');
+				$("div#"+$data_container).css('min-height','500');
+			}
+			$("div#"+$data_container).css('border-width',$border_width);
+			$("div#"+$data_container).css('border-color',$border_color);
+			$("div#"+$data_container).css('border-style',$border_style);
 			$("div#"+$data_container).css('padding',$content_margin);
-			$("#"+$data_container).css("overflow","scroll");
-									
+			if($scrollable){
+				$("#"+$data_container).css("overflow","scroll");
+			}else{
+				$("#"+$data_container).css("overflow","visible");
+			}					
 			$("#warning").replaceWith("");
 			var $data = JSON.parse(data);
        		
@@ -181,9 +206,15 @@
 			$('#'+$search_container).append("<div class='row'><div class='twelve columns'><input type='button' class='button' value='"+$search_button_text+"' id='"+$search_button_id+"' style='margin:20px 0 0 0;'></div></div>");
 	
 		}
-		if($load_button){
+		if($load_button && !($auto_load)){
 			$('#'+$search_container).append("<div class='row'><div class='twelve columns'><input type='button' class='button' value='"+$load_button_text+"' id='append_button' style='margin:20px 0 0 0;'></div></div>");
+		}else if(!($scrollable) && $auto_load){
+			$('#'+$search_container).append("<div class='row'><div class='twelve columns'><input type='button' class='button' value='"+$load_button_text+"' id='append_button' style='margin:20px 0 0 0;'></div></div>");
+
 		}
+		
+		
+		
 		//kill session values when new pane is initialized
 		$.post($kill_session,function(data) { 
 		
@@ -195,6 +226,12 @@
 			
 	/****this loads more data and appends the container from specified page**********/	
 	$('#append_button').click( function(){
+		
+			load_data();
+	});
+	
+	function load_data(){
+	
 		$('#progress').show();
 		setTimeout(function(){
 		
@@ -216,9 +253,9 @@
        					
     		})
 		}, 800);
-			
-	});
 	
+		
+	}
 	
 	
 	$('#'+$search_button_id).click(function(){

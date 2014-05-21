@@ -11,15 +11,6 @@
 	
 <style type="text/css">
 
-#search-con{
-	height: 450px; 
-	/*overflow: hidden;*/
-	overflow:hidden;
-	border:0px solid #ccc;
-	width:100%;
-	max-width:1000px;
-	/*padding:10px 0 10px 0;*/
-}
 #progress{
     display:    none;
     position:   fixed;
@@ -49,29 +40,29 @@ body.loading #progress {
 //should give option to auto generate container or name their own
 $(document).ready(function(){
 		$('#search-con').scrollboy({
-       			//note it either auto loads or loads by button not both.
+       			/****************configuration******************/
        	
+       			auto_load	         : true,								//defines if it will pull in data when the scroll reaches the nd
+       			border_color         : '#555555',							//border-color of the scroll window, takes in css values
+       			border_style         : 'solid',								//border-style css setting
+       			border_width         : '2px',
+       			content_margin       : '10px',
+       			data_container       : 'data-con',							//pass the id of the container you want to append the data to
+       			fields               : "first name:fname:last name:lname",	//pass fields in that you want to attach to you search, follow format label text:id
+       			height               : "500px",
+       			increment            : '10',								//pass how many values you want returned upon completion
+       			kill_session         : 'kill_session.php',					//
+				load_button          : true,
+				load_button_text     : 'load more',
+				load_page	         : 'data.php',
+				scrollable           : true,
+				search_button        : true,
+				search_button_text   : 'search',
+				search_button_id     : "search_button",
+				search_container_id  : 'search_box',
+       			width: "100%"
        			
-       			width: "100%",
-       			height: "500px",
-       			kill_session : 'kill_session.php',
-       			scrollable: true,
-				load_page	 : 'data.php',
-				load_button : true,
-				search_button : true,
-				auto_load	:false,
-				load_button_text: 'load more',
-				search_button_text: 'search',
-				search_button_id : "search_button",
-				data_container  : 'data-con',
-				search_container : 'search_box',
-				increment : '10',
-				border_width : '2px',
-				border_style : 'solid',
-				border_color : '#555555',
-       			content_margin: '10px',
        			
-       			fields : "first name:fname:last name:lname"
        		});
        		
        	});
