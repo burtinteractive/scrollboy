@@ -34,26 +34,33 @@
 		****************************************/
 		
 		var settings =$.extend({
-			//records		 : '10',
-			increment  	     : '10',
-			width		     : '100%',
-			height		     : '635px',
-			scrollable	     : true,
-			kill_session     : null,
-			increment		 : 10,
-			load_page	     : null,
-			load_button      : true,
-			load_button_text : "load more",
-			data_container   : null,
-			border_width	 : null,
-			border_style	 : null,
-			border_color	 : null,
-			content_margin   : null,
-			add_search 		 : false,
-			fields			 : null
+			//records		   : '10',
+			increment  	       : '10',
+			width		       : '100%',
+			height		       : '635px',
+			scrollable	       : true,
+			kill_session       : null,
+			increment		   : 10,
+			load_page	       : null,
+			load_button        : true,
+			search_button      : null,
+			load_button_text   : "load more",
+			search_button_text : null,
+			search_button_id   : "search_button",
+			data_container     : null,
+			search_container   : null,
+			border_width	   : null,
+			border_style	   : null,
+			border_color	   : null,
+			content_margin     : null,
+			add_search 		   : false,
+			fields			   : null
 		}, options);
 		
-		
+		/*************************************************************************
+		* Setups all variables
+		*
+		**************************************************************************/
 			$kill_session=settings.kill_session;
 			$load_page=settings.load_page;
 			var height=0;
@@ -63,52 +70,50 @@
 			$load_button = settings.load_button;
 			$load_button_text = settings.load_button_text;
 			$data_container = settings.data_container;
+			$search_container = settings.search_container;
 			$increment = (settings.increment*1);
 			$increment2 = $increment *1;
 			$border_width = settings.border_width;
 			$border_color = settings.border_color;
 			$border_style = settings.border_style;
 			$content_margin = settings.content_margin;
+			$search_button = settings.search_button;
+			$search_button_text = settings.search_button_text;
+			$search_button_id = settings.search_button_id;
 			var $fields = new Array();
 			$fields =validate_fields(settings.fields);
 			
 			
-			
-		 this.each(function(){
-		 //	$("div#"+$data_container).css('width',settings.width);
-		 	//$("div#"+$data_container).css('max-height',settings.height);
-		 	
+			addFields($fields);
+	
+		
+		
+		
+		/*************************************************************************
+		* Setups the pane
+		*
+		**************************************************************************/
+		
+		$.post($load_page,function (data) {
+			initialize(data);
 			
 		});
-	
-		//initializes the search pane
-		var search_pane = $('div#data-con');
-		/*increment keeps track of where in the query to pull the data from*******/
-		var increment =10;
 		
-		var api;
-		//$("#"+$data_container).load($load_page,function () {
-		$.post($load_page,function (data) {
+		function initialize(data){
+			
 			$("div#"+$data_container).css('max-width',settings.width);
 			$("div#"+$data_container).css('max-height',settings.height);
 			$("div#"+$data_container).css('border-width',settings.border_width);
 			$("div#"+$data_container).css('border-color',settings.border_color);
 			$("div#"+$data_container).css('border-style',settings.border_style);
 			$("div#"+$data_container).css('padding',$content_margin);
-			console.log($("#"+$data_container).height() );
-			//if($("#"+$data_container).height() > $height && $scrollable ){
-								
-									$("#"+$data_container).css("overflow","scroll");
-									console.log("should be scrolling");
+			$("#"+$data_container).css("overflow","scroll");
+									
 			$("#warning").replaceWith("");
 			var $data = JSON.parse(data);
        		
-       		$($data.content).appendTo($("#"+$data_container));						
-										
-			
-				
-			
-		});
+       		$($data.content).appendTo($("#"+$data_container));			
+		}
 		
 		function validate_fields($string){
 			
@@ -147,10 +152,6 @@
 					}
 					
 					
-					
-					console.log($temp_arr[$i]);
-					
-					
 				}
 				
 			}else{
@@ -161,15 +162,27 @@
 			return $temp_arr;
 		
 		}
+		function addFields($arr){
+			for(var $i=0; $i< $arr.length;$i++){
+				//console.log($temp_arr[$i]);
+				$('#'+$search_container).append($arr[$i]+" <input type='text' id='"+$arr[$i+1]+"' > ");
+				$i++;
+				
+			}
+			
+			
+		}
 		
 		
         /********this part appends thwe load button onto the table*********/
         //***************append other things here to customize the form*************/
         
-		//$('#search_box').append("<div class='bar'></div>");
-		
+		if($search_button){
+			$('#'+$search_container).append("<div class='row'><div class='twelve columns'><input type='button' class='button' value='"+$search_button_text+"' id='"+$search_button_id+"' style='margin:20px 0 0 0;'></div></div>");
+	
+		}
 		if($load_button){
-			$('#search_box').append("<div class='row'><div class='twelve columns'><input type='button' class='button' value='"+$load_button_text+"' id='append_button' style='margin:20px 0 0 0;'></div></div>");
+			$('#'+$search_container).append("<div class='row'><div class='twelve columns'><input type='button' class='button' value='"+$load_button_text+"' id='append_button' style='margin:20px 0 0 0;'></div></div>");
 		}
 		//kill session values when new pane is initialized
 		$.post($kill_session,function(data) { 
@@ -180,7 +193,7 @@
 		
 		
 			
-	/****this loads more data and appends the the table from sheets2.php**********/	
+	/****this loads more data and appends the container from specified page**********/	
 	$('#append_button').click( function(){
 		$('#progress').show();
 		setTimeout(function(){
@@ -208,24 +221,36 @@
 	
 	
 	
-	$('#search_button').click(function(){
-		/*********cleared stored values in the session for lname and last name
-		*a new search so kill old session values.
-		*****/
+	$('#'+$search_button_id).click(function(){
+		
 		$.post($kill_session,function(data) { 
 		
 		});
-		$increment =$increment;
-		$fname = $('#fname').val();
-		$lname = $('#lname').val();
+		var $post_variables= new Array();
+		for(var $i=0; $i< $fields.length;$i++){
+				$post_variables[$i]=$fields[$i+1];
+				
+				$i++;
+				$post_variables[$i]= $('#'+$fields[$i]).val();
+			}
+			
+		console.log($post_variables);
+	
+		$increment2 =  $increment;
+		//loop through array of fields and then generate 
+		/****************will need to invoke session variables to store old query************/
+		
 		//load new results into the page but keep in mind current restraints
-		$.post($load_page+'?num='+$increment+"&new_search=yes", { fname:$fname,lname:$lname},function(data) { 	
-       					$('.jspPane').empty();
-       					$('.jspPane').append(data);
-       					$('.jspPane').css('width','100%');
-       					$('.jspPane').width('100%');
-       					api.reinitialise();
+		/***********send over as an array***********************/
+		$.post($load_page, { 
+			post_variables:$post_variables,
+			increment:$increment,
+			num:$increment2,
+			new_search:'yes'
+		}
+		,function(data) { 	
        					
+       					initialize(data);
     		})
 	
 	

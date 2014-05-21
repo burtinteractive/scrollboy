@@ -58,16 +58,20 @@ $(document).ready(function(){
        			scrollable: true,
 				load_page	 : 'data.php',
 				load_button : true,
+				search_button : true,
 				auto_load	:false,
 				load_button_text: 'load more',
+				search_button_text: 'search',
+				search_button_id : "search_button",
 				data_container  : 'data-con',
+				search_container : 'search_box',
 				increment : '10',
 				border_width : '2px',
 				border_style : 'solid',
 				border_color : '#555555',
        			content_margin: '10px',
        			
-       			fields : "first name:fname:last name:n/ame"
+       			fields : "first name:fname:last name:lname"
        		});
        		
        	});
