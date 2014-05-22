@@ -87,7 +87,7 @@
 			$search_button_id = settings.search_button_id;
 			
 			
-			
+			$old_query="";
 			addFields($fields);
 	
 		
@@ -115,7 +115,19 @@
    			 }
 		});
 		
-		
+		/**************************************************************
+		* Clear Data  
+		* clears out all data contained in current container
+		* variables:none
+		****************************************************************/
+		function clear_data(){
+			$("#"+$data_container).html(" ");	
+		}
+		/**************************************************************
+		* Initialize  
+		* sets up container and adds the data to it
+		* variables: array data
+		****************************************************************/
 		function initialize(data){
 			
 			$("div#"+$data_container).css('max-width',settings.width);
@@ -131,6 +143,8 @@
 			$("div#"+$data_container).css('padding',$content_margin);
 			if($scrollable){
 				$("#"+$data_container).css("overflow","scroll");
+				$("#"+$data_container).scrollTop(0);
+				
 			}else{
 				$("#"+$data_container).css("overflow","visible");
 			}					
@@ -154,23 +168,15 @@
 					
 					//check first character is a letter
 					if(((($i*1)+1) % 2) == 0){
-					
-						
 						if(all_letters.test($temp_arr[$i].substring(0,1))){
-							console.log("it does have all letters");
-						}else{
 							
+						}else{
 							//replace first digit with random letter
 							$temp_arr[$i] =	$temp_arr[$i].substring(1,($temp_arr[$i].length));
-							$temp_arr[$i]= Math.random().toString(16).replace(/[^a-z]+/g, '')+ $temp_arr[$i];
-							
+							$temp_arr[$i]= Math.random().toString(16).replace(/[^a-z]+/g, '')+ $temp_arr[$i];	
 						}
-						
 						//check if it contains anything besides a [0-9]-_:. anything else remove
-						
 						if(not_compliant.test($temp_arr[$i])){
-							
-							
 							$temp_arr[$i]= $temp_arr[$i].replace(not_compliant,Math.random().toString(16));
 							 
 						}
@@ -212,19 +218,18 @@
 			$('#'+$search_container).append("<div class='row'><div class='twelve columns'><input type='button' class='button' value='"+$load_button_text+"' id='append_button' style='margin:20px 0 0 0;'></div></div>");
 
 		}
-		
-		
-		
+	
 		//kill session values when new pane is initialized
 		$.post($kill_session,function(data) { 
 		
 		});
 			
 		
-		
-		
-			
-	/****this loads more data and appends the container from specified page**********/	
+	/**************************************************************
+	* Append button function  
+	* appends data to the data container based on load criteria
+	* variables:none
+	****************************************************************/
 	$('#append_button').click( function(){
 		
 			load_data();
@@ -237,8 +242,12 @@
 		
 			$increment2 = ($increment2*1)+ $increment;
 			
-			
-			$.post($load_page,{num:$increment2,increment:$increment,old_query:'yes'},function(data) { 	
+			$.post($load_page,{
+							num:$increment2,
+							increment:$increment,
+							old_query:encodeURIComponent($old_query),
+							new_search:'0'
+							},function(data) { 	
 							
 							if($("#"+$data_container).height() >$height && $scrollable ){
 								
@@ -248,15 +257,23 @@
 						var $data = JSON.parse(data);
        				
        					$($data.content).appendTo($("#"+$data_container));
-       					
-       					
-       					
+       					console.log(JSON.stringify(data));
+       					$old_query= $($data.old_query);
+       					console.log($old_query +" here is old query");
+       					if($old_query.is(Object)){
+       						$old_query=null;
+       					}
+       					console.log($old_query +" here is old query");
     		})
 		}, 800);
 	
 		
 	}
-	
+	/**************************************************************
+	* Search button function  
+	* will reformat results based on search criteria 
+	* variables:none
+	****************************************************************/
 	
 	$('#'+$search_button_id).click(function(){
 		
@@ -265,28 +282,24 @@
 		});
 		var $post_variables= new Array();
 		for(var $i=0; $i< $fields.length;$i++){
-				$post_variables[$i]=$fields[$i+1];
-				
+		
+				$post_variables[$i]=$fields[$i+1];		
 				$i++;
 				$post_variables[$i]= $('#'+$fields[$i]).val();
-			}
-			
-		console.log($post_variables);
-	
+		}
+				
 		$increment2 =  $increment;
-		//loop through array of fields and then generate 
-		/****************will need to invoke session variables to store old query************/
-		
+		console.log($post_variables);
 		//load new results into the page but keep in mind current restraints
 		/***********send over as an array***********************/
 		$.post($load_page, { 
 			post_variables:$post_variables,
 			increment:$increment,
 			num:$increment2,
-			new_search:'yes'
+			new_search:"1"
 		}
 		,function(data) { 	
-       					
+       					clear_data();
        					initialize(data);
     		})
 	
