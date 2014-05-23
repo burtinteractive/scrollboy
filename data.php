@@ -1,8 +1,4 @@
 <? 
-session_start();
-//mysql_connect("localhost", "aburt", "sooner#1") or die(mysql_error());
-//mysql_select_db("scrollboy") or die(mysql_error());
-
 /*********************************************************************
 *Copyright 2014 Adam Burt www.burtinteractive.com
 *
@@ -31,10 +27,10 @@ session_start();
 	
 	$array=$_POST['post_variables'];
 	
-	$_SESSION['arr'] = $array;
+	
 	
 	$new_search= $_POST['new_search'];
-	
+
 	if(!(empty($_POST['increment'])) ){
 		$start= $_POST['num'] - ($_POST['increment']-1);
 	
@@ -49,13 +45,10 @@ session_start();
 	}
 	
 	$content = "";
-	if(!(empty($_POST['increment'])) && $_POST['old_query'] != null){
-		$old_query =$_POST['old_query']." ";
-	}else{
-		$old_query = "";
-	}
 	
-	$_SESSION['old_q']=$old_query;
+	$old_query =$_POST['old_query'];
+	
+	
 	for($i=$start;$i<=$num;$i++){
 	
 		$content .= "<p>this is content #".$i."</p><br/>";
@@ -67,9 +60,6 @@ session_start();
 	//this examples show how to use the ranges to pull queries of last name and first name out with data posted with javascript
 	/****************/
 
-	$_SESSION['fname2']=$array[1];
-	$_SESSION['lname2']=$array[3];
-	
 	$fname=$array[1];
 	$lname=$array[3];
 	$query_addon ="limit $start, $num ";
@@ -79,10 +69,10 @@ session_start();
 			$query = "select * from members where lname LIKE '%".$array[1]."%' and fname LIKE '%".$array[3]."%' ";
 	
 		}else if($lname !=""){
-			$query = "select * from members where lname LIKE '%".$array[1]."%' ";
+			$query = "select * from members where lname LIKE '%".$array[3]."%' ";
 		}else if($fname !="" ){
 		
-			$query = "select * from members where fname LIKE '%".$array[3]."%' ";
+			$query = "select * from members where fname LIKE '%".$array[1]."%' ";
 		}else{
 			//default query here
 			$query = "select * from members ";
@@ -90,6 +80,7 @@ session_start();
 	}else{
 		$query = $old_query;
 	}
+
 	//call this before you do the addon that way if query is reloaded then it will take new values
 	$data['old_query']=$query;
 	//complete query here

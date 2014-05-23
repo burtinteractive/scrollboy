@@ -87,7 +87,7 @@
 			$search_button_id = settings.search_button_id;
 			
 			
-			$old_query="";
+			$old_query = " ";
 			addFields($fields);
 	
 		
@@ -157,7 +157,7 @@
 		function validate_fields($string){
 			
 			$temp_arr= $string.split(":");
-			//alert($temp_arr.length); 
+			
 			var all_letters = /[A-Z a-z]/; 
 			var not_compliant=/[!@#$%^&*()+=<>?,|\[\]\\{}\/]/
 			if($temp_arr.length % 2 == 0){
@@ -195,7 +195,7 @@
 		}
 		function addFields($arr){
 			for(var $i=0; $i< $arr.length;$i++){
-				//console.log($temp_arr[$i]);
+				
 				$('#'+$search_container).append($arr[$i]+" <input type='text' id='"+$arr[$i+1]+"' > ");
 				$i++;
 				
@@ -245,25 +245,22 @@
 			$.post($load_page,{
 							num:$increment2,
 							increment:$increment,
-							old_query:encodeURIComponent($old_query),
+							old_query:$old_query,
 							new_search:'0'
 							},function(data) { 	
 							
 							if($("#"+$data_container).height() >$height && $scrollable ){
 								
 									$("#"+$data_container).css("overflow","scroll");
-									console.log("should be scrolling");
+									
 							}
 						var $data = JSON.parse(data);
        				
        					$($data.content).appendTo($("#"+$data_container));
-       					console.log(JSON.stringify(data));
-       					$old_query= $($data.old_query);
-       					console.log($old_query +" here is old query");
-       					if($old_query.is(Object)){
-       						$old_query=null;
-       					}
-       					console.log($old_query +" here is old query");
+       					
+       					$old_query= $data.old_query;
+       					
+       					
     		})
 		}, 800);
 	
@@ -289,7 +286,7 @@
 		}
 				
 		$increment2 =  $increment;
-		console.log($post_variables);
+	
 		//load new results into the page but keep in mind current restraints
 		/***********send over as an array***********************/
 		$.post($load_page, { 
@@ -300,7 +297,13 @@
 		}
 		,function(data) { 	
        					clear_data();
+       				
+       					var $data = JSON.parse(data);
+       					$old_query= $data.old_query
+       					
+       				
        					initialize(data);
+       				
     		})
 	
 	
